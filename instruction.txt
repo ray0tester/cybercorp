@@ -1,0 +1,20 @@
+CREATE A FILE THEN SAVE IT
+FOR EXAMPLE I WILL CREATE A FILE NAMED malware.php
+THEN INSIDE THE malware.php WRITE any virus patterns to detect
+
+//for example malware.php code
+
+
+<?php
+
+    $encoded = "ZXZhbChcJF9QT1NUWydjbWQnXSk7"; 
+    $decoded = base64_decode($encoded);
+
+    echo "Decoded : " . $decoded;
+
+?>
+
+
+
+//example for txt file save this as malware.txt
+JUST WRITRE virus THEN SAVE

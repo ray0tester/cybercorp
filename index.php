@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberCorp | Malware Detection</title>
+    <link rel="icon" href="img/virus.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1976d2;
+            --primary-dark: #1565c0;
+            --secondary-color: #f5f5f5;
+            --text-primary: #2c3e50;
+            --text-secondary: #546e7a;
+            --border-color: #e0e0e0;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), #4caf50, #ff9800, #f44336);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-top: 0;
+            font-weight: 700;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        h1 i {
+            font-size: 1.8rem;
+        }
+        
+        .description {
+            margin-bottom: 30px;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            gap: 5px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            font-weight: 600;
+            color: var(--text-secondary);
+            position: relative;
+            transition: all 0.3s ease;
+            border-radius: 6px 6px 0 0;
+        }
+        
+        .tab:hover {
+            color: var(--primary-color);
+            background: rgba(25, 118, 210, 0.05);
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            padding: 50px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            background: #fcfdff;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(25, 118, 210, 0.02);
+        }
+        
+        .upload-area.highlight {
+            border-color: var(--primary-color);
+            background: rgba(25, 118, 210, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .upload-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(25, 118, 210, 0.2);
+        }
+        
+        .upload-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+        
+        .upload-btn:active {
+            transform: translateY(0);
+        }
+        
+        .upload-area p {
+            margin-top: 15px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        .file-info {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f9ff;
+            border-radius: 6px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .file-info.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .file-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .file-size {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .analyze-btn {
+            margin-top: 15px;
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .analyze-btn:hover {
+            background: #43a047;
+        }
+        
+        .notice {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+        
+        .notice strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .notice a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .notice a:hover {
+            text-decoration: underline;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature {
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .feature-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .feature-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .results {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .results.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .results-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .result-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .result-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .result-value {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .malware-detected {
+            color: var(--error-color);
+            font-weight: 600;
+        }
+        
+        .clean-file {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                flex: 1 0 100px;
+                text-align: center;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-shield-virus"></i> CyberCorp</h1>
+        <p class="description">
+            Analyze suspicious files, domains, IPs and URLs to detect malware and other breaches.
+            Our advanced threat intelligence platform automatically shares findings with the security community
+            to improve protection for everyone.
+        </p>
+        
+        <div class="tabs">
+            <div class="tab active"><i class="fas fa-file-alt"></i> FILE</div>
+            <div class="tab"><i class="fas fa-link"></i> URL</div>
+            <div class="tab"><i class="fas fa-search"></i> SEARCH</div>
+            <div class="tab"><i class="fas fa-database"></i> DATA</div>
+        </div>
+        
+        <form id="scanForm" action="scan.php" method="POST" enctype="multipart/form-data">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <input type="file" id="fileInput" name="fileToScan" style="display: none;" required>
+                <button type="button" class="upload-btn" id="uploadBtn">Choose file</button>
+                <p>or drag and drop files here (Max. 650MB)</p>
+                
+                <div class="file-info" id="fileInfo">
+                    <div class="file-name">
+                        <i class="fas fa-file"></i>
+                        <span id="fileName">No file selected</span>
+                    </div>
+                    <div class="file-size" id="fileSize">0 Bytes</div>
+                    <button type="submit" class="analyze-btn" id="analyzeBtn">Analyze Now</button>
+                </div>
+            </div>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Scanning file for malware...</p>
+        </div>
+        
+        <div class="results" id="results">
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <div class="feature-title">Malware Detection</div>
+                <div class="feature-desc">Identify viruses, worms, trojans, and other malicious threats in your files.</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="feature-title">Behavioral Analysis</div>
+                <div class="feature-desc">See how files behave in controlled environments to detect suspicious activity.</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="feature-title">Community Protection</div>
+                <div class="feature-desc">Contribute to community threat intelligence by sharing scan results.</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <div class="feature-title">Scan History</div>
+                <div class="feature-desc">Keep track of all your previous scans and their results.</div>
+            </div>
+        </div>
+        
+        <p class="notice">
+            By submitting data above, you are agreeing to our 
+            <a href="#">Terms of Service</a> and <a href="#">Privacy Notice</a>, 
+            and to the <strong>sharing of your Sample submission with the security community.</strong> 
+            Please do not submit any personal information; we are not responsible for the contents of your submission. 
+            <a href="#">Learn more about our submission policies</a>.
+        </p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const scanForm = document.getElementById('scanForm');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            
+            uploadBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    displayFileInfo(file);
+                }
+            });
+            
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.classList.add('highlight');
+            });
+            
+            uploadArea.addEventListener('dragleave', function() {
+                uploadArea.classList.remove('highlight');
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('highlight');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    fileInput.files = e.dataTransfer.files;
+                    displayFileInfo(file);
+                }
+            });
+            
+            function displayFileInfo(file) {
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileInfo.classList.add('show');
+                results.classList.remove('show');
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            scanForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!fileInput.files.length) {
+                    alert('Please select a file to scan');
+                    return;
+                }
+                
+                loading.classList.add('show');
+                results.classList.remove('show');
+
+                const formData = new FormData(scanForm);
+
+                fetch('scan.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    loading.classList.remove('show');
+
+                    displayResults(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    loading.classList.remove('show');
+                    results.innerHTML = `
+                        <div class="results-title">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Scan Failed
+                        </div>
+                        <p>Please try again.</p>
+                    `;
+                    results.classList.add('show');
+                });
+            });
+            
+            function displayResults(data) {
+                let resultHTML = `
+                    <div class="results-title">
+                        <i class="fas fa-search"></i>
+                        Scan Results
+                    </div>
+                    <div class="result-item">
+                        <div class="result-name">File Name</div>
+                        <div class="result-value">${data.fileName}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-name">File Size</div>
+                        <div class="result-value">${data.fileSize}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-name">File Type</div>
+                        <div class="result-value">${data.fileType}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-name">Scan Result</div>
+                        <div class="result-value ${data.isMalicious ? 'malware-detected' : 'clean-file'}">
+                            ${data.isMalicious ? 'MALICIOUS FILE DETECTED!' : 'No threats detected'}
+                        </div>
+                    </div>
+                `;
+                
+                if (data.isMalicious) {
+                    resultHTML += `
+                        <div class="result-item">
+                            <div class="result-name">Threat Type</div>
+                            <div class="result-value">${data.threatType}</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-name">Details</div>
+                            <div class="result-value">${data.details}</div>
+                        </div>
+                    `;
+                }
+                
+                results.innerHTML = resultHTML;
+                results.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>
